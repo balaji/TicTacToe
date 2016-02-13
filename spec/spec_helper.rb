@@ -14,4 +14,9 @@ module RSpecMixin
   end
 end
 
-RSpec.configure { |c| c.include RSpecMixin }
+RSpec.configure do |config|
+  config.include RSpecMixin
+  DataMapper::setup(:default, "sqlite3://#{Dir.pwd}/game_test.db")
+  DataMapper.finalize
+  Game.auto_migrate!
+end
