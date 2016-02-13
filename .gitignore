@@ -1,3 +1,4 @@
 .idea
 game.db
 game_test.db
+node_modules
