@@ -1,3 +1,7 @@
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
 #container {
     width: 100%;
     text-align: center;
@@ -7,6 +11,13 @@
     width: 300px;
     margin: 0 auto;
     border: 1px solid black;
+    display: inline-block;
+}
+
+input[type=button],
+button,
+input[type=submit] {
+    font-size: 16px;
 }
 
 .square,
@@ -33,4 +44,33 @@
 .square:hover {
     background-color: yellowgreen;
     color: yellowgreen;
+}
+
+.players {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.player {
+    height: 50px;
+    line-height: 50px;
+    width: 200px;
+    border: 1px solid black;
+    margin: 15px;
+}
+
+.player.active {
+    background-color: green;
+    color: white;
+}
+
+.leader-board {
+    display: inline-block;
+    width: 200px;
+    margin: 0 15px 15px;
+    vertical-align: top;
+}
+
+.leader-board .display {
+    padding-bottom: 15px;
 }
