@@ -2,3 +2,6 @@ language: ruby
 rvm:
  - "2.3.0"
 script: bundle exec rspec
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libsqlite3-dev libpq-dev
