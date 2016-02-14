@@ -8,6 +8,7 @@ group :development, :test do
   gem 'rspec'
   gem 'rack-test'
   gem 'dm-sqlite-adapter'
+  gem 'rubocop'
 end
 
 # Postgres for Heroku, as it does not allow sqlite in production.
