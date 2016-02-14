@@ -2,6 +2,7 @@ require 'rubygems'
 require 'sinatra'
 require 'json'
 require 'data_mapper'
+require 'tilt/erb'
 
 require_relative 'models/game'
 require_relative 'lib/tic_tac_toe'

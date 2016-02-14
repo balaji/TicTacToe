@@ -10,6 +10,7 @@ group :development, :test do
   gem 'dm-sqlite-adapter'
 end
 
+# Postgres for Heroku, as it does not allow sqlite in production.
 group :production do
   gem 'dm-postgres-adapter'
 end
