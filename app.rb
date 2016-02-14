@@ -15,13 +15,18 @@ get '/' do
   erb :index
 end
 
-get '/:id' do
+get '/:id.json' do
   game = Game.get(params[:id])
   if game != nil
-    erb :game, locals: {game_state: JSON.parse(game.game_state)}
+    content_type :json
+    game.game_state
   else
     status 404
   end
+end
+
+get '/:id' do
+  erb :game, locals: {game_id: params[:id]}
 end
 
 post '/new_game' do
@@ -30,7 +35,7 @@ post '/new_game' do
   state = {
       grid: [%w(- - -), %w(- - -), %w(- - -)],
       next_turn: :a,
-      game_status: TicTacToe::Game::Status::IN_PROGRESS
+      game_status: {state: TicTacToe::Game::Status::IN_PROGRESS}
   }.to_json
 
   game = Game.new(id: id, game_state: state)

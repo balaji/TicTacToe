@@ -1,2 +1,18 @@
-<p>game on!</p>
-<%= game_state %>
+<script type="text/javascript" charset="utf-8">
+  var Globals = {
+    GameID: "<%= game_id %>"
+  };
+
+  function goHome() {
+    window.location.href = "/";
+  }
+</script>
+
+<div id="content"></div>
+<br>
+<form action="/new_game" method="post">
+  <input type="submit" value="New Game"/>
+  <input type="button" value="Go Home" onclick="goHome()"/>
+</form>
+
+<script src="/js/static/bundle.js" charset="utf-8"></script>

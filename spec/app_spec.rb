@@ -53,7 +53,7 @@ describe 'The Tic-Tac-Toe App' do
     actual_response = JSON.parse(last_response.body)
 
     expect(actual_response['grid']).to eq([%w(X O -), %w(O X -), %w(- - X)])
-    expect(actual_response['game_status']).to eq('won')
+    expect(actual_response['game_status']['state']).to eq('won')
   end
 
   it 'should win the game horizontally' do
@@ -69,7 +69,7 @@ describe 'The Tic-Tac-Toe App' do
     actual_response = JSON.parse(last_response.body)
 
     expect(actual_response['grid']).to eq([%w(X X X), %w(O O -), %w(- - -)])
-    expect(actual_response['game_status']).to eq('won')
+    expect(actual_response['game_status']['state']).to eq('won')
   end
 
   it 'should win the game vertically' do
@@ -85,7 +85,7 @@ describe 'The Tic-Tac-Toe App' do
     actual_response = JSON.parse(last_response.body)
 
     expect(actual_response['grid']).to eq([%w(X O -), %w(X O -), %w(X - -)])
-    expect(actual_response['game_status']).to eq('won')
+    expect(actual_response['game_status']['state']).to eq('won')
   end
 
   it 'should fail when a move is attempted after a win' do
@@ -112,7 +112,7 @@ describe 'The Tic-Tac-Toe App' do
     post "/#{game_id}/mark.json", row: 2, column: 1 # player 1
     post "/#{game_id}/mark.json", row: 2, column: 2 # player 2
     actual_response = JSON.parse(last_response.body)
-    expect(actual_response['game_status']).to eq('in_progress') # game still in progress.
+    expect(actual_response['game_status']['state']).to eq('in_progress') # game still in progress.
 
     post "/#{game_id}/mark.json", row: 2, column: 0 # player 1. last move, this draws the game.
 
@@ -120,7 +120,7 @@ describe 'The Tic-Tac-Toe App' do
     actual_response = JSON.parse(last_response.body)
 
     expect(actual_response['grid']).to eq([%w(X O X), %w(O O X), %w(X X O)])
-    expect(actual_response['game_status']).to eq('draw')
+    expect(actual_response['game_status']['state']).to eq('draw')
   end
 
 end

@@ -2,3 +2,35 @@
     width: 100%;
     text-align: center;
 }
+
+.grid {
+    width: 300px;
+    margin: 0 auto;
+    border: 1px solid black;
+}
+
+.square,
+.square_occupied {
+    display: inline-block;
+    width: 98px;
+    height: 98px;
+    line-height: 98px;
+    border: 1px solid black;
+    font-size: 36px;
+}
+
+.square {
+    cursor: pointer;
+    background-color: yellow;
+    color: yellow;
+}
+
+.square_occupied.winner {
+    background-color: green;
+    color: white;
+}
+
+.square:hover {
+    background-color: yellowgreen;
+    color: yellowgreen;
+}
