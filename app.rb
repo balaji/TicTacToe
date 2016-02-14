@@ -6,7 +6,7 @@ require 'data_mapper'
 require_relative 'models/game'
 require_relative 'lib/tic_tac_toe'
 
-DataMapper::setup(:default, "sqlite3://#{Dir.pwd}/game.db")
+DataMapper::setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/game.db")
 DataMapper.finalize
 Game.auto_upgrade!
 
