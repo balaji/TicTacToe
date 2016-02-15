@@ -16,7 +16,8 @@ describe 'The Tic-Tac-Toe App' do
     post '/new_game'
     follow_redirect!
 
-    expect(last_request.url).to match(/http:\/\/example.org\/(\w{8}(-\w{4}){3}-\w{12}?)/)
+    expected_url = %r(http:\/\/example.org\/(\w{8}(-\w{4}){3}-\w{12}?))
+    expect(last_request.url).to match(expected_url)
     expect(last_response).to be_ok
   end
 
@@ -40,7 +41,7 @@ describe 'The Tic-Tac-Toe App' do
     expect(last_response.status).to eq(500)
   end
 
-  it 'should win the game diagonally' do
+  it 'should win the game diagonally from the left' do
     game_id = create_new_game
 
     post "/#{game_id}/mark.json", row: 0, column: 0 # player 1
@@ -53,6 +54,22 @@ describe 'The Tic-Tac-Toe App' do
     actual_response = JSON.parse(last_response.body)
 
     expect(actual_response['grid']).to eq([%w(X O -), %w(O X -), %w(- - X)])
+    expect(actual_response['game_status']['state']).to eq('won')
+  end
+
+  it 'should win the game diagonally from the right' do
+    game_id = create_new_game
+
+    post "/#{game_id}/mark.json", row: 0, column: 2 # player 1
+    post "/#{game_id}/mark.json", row: 0, column: 1 # player 2
+    post "/#{game_id}/mark.json", row: 1, column: 1 # player 1
+    post "/#{game_id}/mark.json", row: 1, column: 0 # player 2
+    post "/#{game_id}/mark.json", row: 2, column: 0 # player 1
+
+    expect(last_response).to be_ok
+    actual_response = JSON.parse(last_response.body)
+
+    expect(actual_response['grid']).to eq([%w(- O X), %w(O X -), %w(X - -)])
     expect(actual_response['game_status']['state']).to eq('won')
   end
 
@@ -112,9 +129,12 @@ describe 'The Tic-Tac-Toe App' do
     post "/#{game_id}/mark.json", row: 2, column: 1 # player 1
     post "/#{game_id}/mark.json", row: 2, column: 2 # player 2
     actual_response = JSON.parse(last_response.body)
-    expect(actual_response['game_status']['state']).to eq('in_progress') # game still in progress.
 
-    post "/#{game_id}/mark.json", row: 2, column: 0 # player 1. last move, this draws the game.
+    # game still in progress.
+    expect(actual_response['game_status']['state']).to eq('in_progress')
+
+    # player 1. last move, this draws the game.
+    post "/#{game_id}/mark.json", row: 2, column: 0
 
     expect(last_response).to be_ok
     actual_response = JSON.parse(last_response.body)
@@ -122,5 +142,4 @@ describe 'The Tic-Tac-Toe App' do
     expect(actual_response['grid']).to eq([%w(X O X), %w(O O X), %w(X X O)])
     expect(actual_response['game_status']['state']).to eq('draw')
   end
-
 end

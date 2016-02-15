@@ -1,3 +1,12 @@
+# The program handles a game of Tic-Tac-Toe in browser.
+#
+# Author::    Balaji Damodaran  (mailto:damodaran.balaji@gmail.com)
+# Copyright:: Copyright (c) 2016
+# License::   Distributes under the same terms as Ruby
+
+# This Sinatra Routes file acts as a controller for HTTP requests
+# and manages state (game play) changes.
+
 require 'rubygems'
 require 'sinatra'
 require 'json'
@@ -7,7 +16,8 @@ require 'tilt/erb'
 require_relative 'models/game'
 require_relative 'lib/tic_tac_toe'
 
-DataMapper::setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/game.db")
+DataMapper.setup(:default,
+                 ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/game.db")
 DataMapper.finalize
 Game.auto_upgrade!
 
@@ -17,7 +27,7 @@ end
 
 get '/:id.json' do
   game = Game.get(params[:id])
-  if game != nil
+  if !game.nil?
     content_type :json
     game.game_state
   else
@@ -26,16 +36,16 @@ get '/:id.json' do
 end
 
 get '/:id' do
-  erb :game, locals: {game_id: params[:id]}
+  erb :game, locals: { game_id: params[:id] }
 end
 
 post '/new_game' do
   id = SecureRandom.uuid
 
   state = {
-      grid: [%w(- - -), %w(- - -), %w(- - -)],
-      next_turn: :a,
-      game_status: {state: TicTacToe::Game::Status::IN_PROGRESS}
+    grid: [%w(- - -), %w(- - -), %w(- - -)],
+    next_turn: :a,
+    game_status: { state: TicTacToe::Game::Status::IN_PROGRESS }
   }.to_json
 
   game = Game.new(id: id, game_state: state)
