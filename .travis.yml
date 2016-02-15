@@ -1,9 +1,13 @@
 language: ruby
 rvm:
   - "2.3.0"
+
+before_install:
+  - npm install -g jshint
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libsqlite3-dev postgresql-9.1 postgresql-server-dev-9.1 libpq-dev
+
 script:
   - bundle exec rspec
   - bundle exec rubocop
-before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y libsqlite3-dev postgresql-9.1 postgresql-server-dev-9.1 libpq-dev
+  - jshint public/js/src/app.js
