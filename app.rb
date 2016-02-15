@@ -1,14 +1,15 @@
 # The program handles a game of Tic-Tac-Toe in browser.
 #
-# Author::    Balaji Damodaran  (mailto:damodaran.balaji@gmail.com)
-# Copyright:: Copyright (c) 2016
-# License::   Distributes under the same terms as Ruby
+# Author    :: Balaji Damodaran  (mailto:damodaran.balaji@gmail.com)
+# Copyright :: Copyright (c) 2016
+# License   :: Distributes under the same terms as Ruby
 
 # This Sinatra Routes file acts as a controller for HTTP requests
 # and manages state (game play) changes.
 
 require 'rubygems'
 require 'sinatra'
+require 'sinatra/respond_with'
 require 'json'
 require 'data_mapper'
 require 'tilt/erb'
@@ -21,24 +22,31 @@ DataMapper.setup(:default,
 DataMapper.finalize
 Game.auto_upgrade!
 
+# Loads home page.
 get '/' do
   erb :index
 end
 
-get '/:id.json' do
-  game = Game.get(params[:id])
-  if !game.nil?
-    content_type :json
-    game.game_state
-  else
-    status 404
+# Responds to both html and json headers.
+# if it is a json request, it returns the state of the game.
+# else it loads the game page without validation.
+get '/:id', provides: [:html, :json] do
+  respond_to do |f|
+    f.json do
+      game = Game.get(params[:id])
+      if !game.nil?
+        content_type :json
+        game.game_state
+      else
+        status 404
+      end
+    end
+
+    f.html { erb :game, locals: { game_id: params[:id] } }
   end
 end
 
-get '/:id' do
-  erb :game, locals: { game_id: params[:id] }
-end
-
+# Creates a new game redirects to game page.
 post '/new_game' do
   id = SecureRandom.uuid
 
@@ -54,6 +62,7 @@ post '/new_game' do
   redirect to("/#{id}")
 end
 
+# Updates the game state with a new move given by row and column co-ordinates.
 post '/:game_id/mark.json' do
   begin
     content_type :json
@@ -68,8 +77,4 @@ post '/:game_id/mark.json' do
   rescue
     status 500
   end
-end
-
-not_found do
-  erb :missing
 end

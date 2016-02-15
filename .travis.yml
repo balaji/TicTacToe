@@ -10,4 +10,4 @@ before_install:
 script:
   - bundle exec rspec
   - bundle exec rubocop
-  - eslint public/js/src/app.js
+  - eslint public/js/src/app.js public/js/src/localStore.js

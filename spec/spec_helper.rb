@@ -1,7 +1,7 @@
-# Author::    Balaji Damodaran  (mailto:damodaran.balaji@gmail.com)
-# Copyright:: Copyright (c) 2016
-# License::   Distributes under the same terms as Ruby
-
+# Author    :: Balaji Damodaran  (mailto:damodaran.balaji@gmail.com)
+# Copyright :: Copyright (c) 2016
+# License   :: Distributes under the same terms as Ruby
+#
 # This helper program is used to include Rack Test Methods in
 # Rspec configuration for testing Sinatra (Rack-based) routes.
 require 'rack/test'

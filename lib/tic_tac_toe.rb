@@ -1,8 +1,8 @@
 module TicTacToe
-  # Author::    Balaji Damodaran  (mailto:damodaran.balaji@gmail.com)
-  # Copyright:: Copyright (c) 2016
-  # License::   Distributes under the same terms as Ruby
-
+  # Author    :: Balaji Damodaran  (mailto:damodaran.balaji@gmail.com)
+  # Copyright :: Copyright (c) 2016
+  # License   :: Distributes under the same terms as Ruby
+  #
   # This module holds the logic to mark a square in the Tic-Tac-Toe
   # game board. Also checks if the game is won or drawn or in progress.
   module Game
@@ -12,21 +12,35 @@ module TicTacToe
       DRAWN = :draw
     end
 
+    @move_data = {
+      'a' => { grid: 'X', next_turn: 'b' },
+      'b' => { grid: 'O', next_turn: 'a' }
+    }
+
+    # function that updates the grid status based on the user action
+    # and returns the new state. It also indicates whether a game is
+    # won, drawn or in progress.
+    #
+    # @param row - x co-ordinate of the square that needs to update
+    # @param column - y co-ordinate of the square that needs to update
+    # @param game_state - current state of the game.
+    #
+    # @raise Invalid mark, if x,y co-ords are invalid or if the game is over.
+    #
+    # @return - updated state of the game.
     def self.mark(row, column, game_state)
       grid = game_state['grid']
       game_status = game_state['game_status']['state']
 
       raise 'Invalid mark' if invalid?(column, game_status, grid, row)
-      move_data = {
-        'a' => { grid: 'X', next_turn: 'b' },
-        'b' => { grid: 'O', next_turn: 'a' }
-      }
-      grid[row][column] = move_data[game_state['next_turn']][:grid]
-      next_turn = move_data[game_state['next_turn']][:next_turn]
+
+      grid[row][column] = @move_data[game_state['next_turn']][:grid]
+      next_turn = @move_data[game_state['next_turn']][:next_turn]
 
       { grid: grid, next_turn: next_turn, game_status: won(grid) }
     end
 
+    private_class_method
     def self.won(grid)
       # same diagonals
       winning_status = diagonal_win(grid)
@@ -40,7 +54,8 @@ module TicTacToe
       { state: Status::IN_PROGRESS }
     end
 
-    private_class_method
+    # function that checks if there is a win diagonally
+    # - both left and right diagonals, in the grid.
     def self.diagonal_win(grid)
       left_diagonal = (0..2).collect { |i| grid[i][i] }
       return {
@@ -53,6 +68,8 @@ module TicTacToe
       } if a_win?(right_diagonal)
     end
 
+    # function that checks if there is a win horizontally or vertically
+    # in the grid.
     def self.straight_win(grid)
       (0..2).each do |row|
         # same rows

@@ -3,7 +3,12 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var jQuery = require("jquery");
+var localStore = require("./localStore.js");
 
+/**
+ * React component for the individual square in a Tic Tac Toe game board.
+ * It has an onClick method that will update the state of the square by calling the backend.
+ */
 var Square = React.createClass({
     playGame: function () {
         if (this.props.value !== "-" || this.props.gameStatus !== "in_progress") {
@@ -18,10 +23,10 @@ var Square = React.createClass({
             data: {"row": this.props.row, "column": this.props.column},
             success: function (data) {
                 if (data.game_status.state === "won") {
-                    updateWins(data.next_turn === "a" ? "b" : "a");
+                    localStore.updateWins(data.next_turn === "a" ? "b" : "a");
                 }
                 if (data.game_status.state === "draw") {
-                    updateDraws();
+                    localStore.updateDraws();
                 }
                 // Re-render parent with updated data.
                 ReactDOM.render(<Grid data={data}/>, document.getElementById("content"));
@@ -49,55 +54,42 @@ var Square = React.createClass({
     }
 });
 
+/**
+ * React component for the Player section.
+ * It displays the Player name, their Tic Tac Toe symbol and
+ * allows editing the player name.
+ */
 var Player = React.createClass({
+    changeName: function () {
+        var newPlayerName = window.prompt("Enter new name", localStore.getPlayerName(this.props.id));
+        if (newPlayerName !== null) {
+            localStore.updatePlayerName(this.props.id, newPlayerName);
+            ReactDOM.render(<Grid data={this.props.data}/>, document.getElementById("content"));
+        }
+    },
     render: function () {
         var className = "player";
         if (this.props.id === this.props.next_turn) {
             className += " active";
         }
         return (
-            <div className={className}>{this.props.name}</div>
+            <div>
+                <div className={className}>{this.props.name}</div>
+                <a href="#" onClick={this.changeName}>change</a>
+            </div>
         );
     }
 });
 
-var getPlayerName = function (playerId) {
-    var defaultNames = {"a": "Player 1", "b": "Player 2"};
-    if (window.localStorage) {
-        return window.localStorage.getItem(playerId) || defaultNames[playerId];
-    }
-    return defaultNames[playerId];
-};
-
-var updateWins = function (playerId) {
-    if (window.localStorage) {
-        var key = playerId + ":wins";
-        var wins = window.localStorage.getItem(key) || 0;
-        window.localStorage.setItem(key, Number(wins) + 1);
-    }
-};
-
-var updateDraws = function () {
-    if (window.localStorage) {
-        var draws = window.localStorage.getItem("draws") || 0;
-        window.localStorage.setItem("draws", Number(draws) + 1);
-    }
-};
-
-var getWins = function (playerId) {
-    return window.localStorage.getItem(playerId + ":wins") || 0;
-};
-
-var getDraws = function () {
-    return window.localStorage.getItem("draws") || 0;
-};
-
+/**
+ * React component to display the Leader board for a given game session.
+ */
 var LeaderBoard = React.createClass({
     render: function () {
         var winner = function (data) {
             var winnerText = "&nbsp;";
             if (data.status === "won") {
-                winnerText = "Game Won. Congratulations!!! <br><strong>" + getPlayerName(data.player) + "</strong>";
+                winnerText = "Game Won. Congratulations!!! <br><strong>" + localStore.getPlayerName(data.player) + "</strong>";
             } else if (data.status === "draw") {
                 winnerText = "Game Drawn.<br><strong> Well played!</strong>";
             }
@@ -109,11 +101,11 @@ var LeaderBoard = React.createClass({
                 <p>Leader board</p>
                 <div className="display">
                     <strong>Wins:</strong>
-                    <div>{getPlayerName("a")} : {getWins("a")}</div>
-                    <div>{getPlayerName("b")} : {getWins("b")}</div>
+                    <div>{localStore.getPlayerName("a")} : {localStore.getWins("a")}</div>
+                    <div>{localStore.getPlayerName("b")} : {localStore.getWins("b")}</div>
                 </div>
                 <div className="display">
-                    <strong>Draws</strong> : {getDraws()}
+                    <strong>Draws</strong> : {localStore.getDraws()}
                 </div>
                 <div className="congrats-text" dangerouslySetInnerHTML={winner(this.props.winner)}></div>
             </div>
@@ -121,11 +113,22 @@ var LeaderBoard = React.createClass({
     }
 });
 
+/**
+ * React component that displays the current state of the game.
+ * This is the root component.
+ */
 var Grid = React.createClass({
     render: function () {
         var squares = [];
         var winnerBlocks = [];
         var data = this.props.data;
+        // If there is an error in loading the state of the game,
+        // the game board is not shown.
+        if (data === "error") {
+            return (
+                <p>Unexpected error.</p>
+            );
+        }
         var nextTurn = data.next_turn;
         var winner = {status: data.game_status.state};
         if (data.game_status.state === "won") {
@@ -140,6 +143,9 @@ var Grid = React.createClass({
 
         jQuery.each(data.grid, function (i, row) {
             jQuery.each(row, function (j, item) {
+                // winner blocks are used to display the winning combination if the
+                // game is won. The code below checks if a given square
+                // belongs to the winning block or not.
                 var winnerBlock = false;
                 if (winnerBlocks.length === 3) {
                     var k;
@@ -156,8 +162,8 @@ var Grid = React.createClass({
                 );
             });
         });
-        var player1Name = getPlayerName("a") + " (X)";
-        var player2Name = getPlayerName("b") + " (O)";
+        var player1Name = localStore.getPlayerName("a") + " (X)";
+        var player2Name = localStore.getPlayerName("b") + " (O)";
         return (
             <div>
                 <LeaderBoard winner={winner}/>
@@ -166,14 +172,18 @@ var Grid = React.createClass({
                 </div>
                 <div className="players">
                     <p>Current Turn:</p>
-                    <Player name={player1Name} id="a" next_turn={nextTurn}/>
-                    <Player name={player2Name} id="b" next_turn={nextTurn}/>
+                    <Player name={player1Name} id="a" next_turn={nextTurn} data={data}/>
+                    <Player name={player2Name} id="b" next_turn={nextTurn} data={data}/>
                 </div>
             </div>
         );
     }
 });
 
+/**
+ * React component that is used to initialize the Grid for the first time
+ * when the page is loaded. It makes a backend call to get the game status.
+ */
 var Game = React.createClass({
     getInitialState: function () {
         return {data: {grid: [], game_status: {}}};
@@ -188,6 +198,7 @@ var Game = React.createClass({
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
+                this.setState({data: "error"});
             }.bind(this)
         });
     },
@@ -198,5 +209,5 @@ var Game = React.createClass({
     }
 });
 
-var url = "/" + window.Globals.GameID + ".json";
+var url = "/" + window.Globals.GameID;
 ReactDOM.render(<Game url={url}/>, document.getElementById("content"));

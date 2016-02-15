@@ -57,6 +57,7 @@ input[type=submit] {
     width: 200px;
     border: 1px solid black;
     margin: 15px;
+    display: inline-block;
 }
 
 .player.active {
