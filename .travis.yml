@@ -3,11 +3,11 @@ rvm:
   - "2.3.0"
 
 before_install:
-  - npm install -g jshint
+  - npm install -g eslint eslint-plugin-promise eslint-plugin-standard eslint-plugin-react
   - sudo apt-get -qq update
   - sudo apt-get install -y libsqlite3-dev postgresql-9.1 postgresql-server-dev-9.1 libpq-dev
 
 script:
   - bundle exec rspec
   - bundle exec rubocop
-  - jshint public/js/src/app.js
+  - eslint public/js/src/app.js

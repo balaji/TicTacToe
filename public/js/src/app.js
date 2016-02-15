@@ -12,9 +12,9 @@ var Square = React.createClass({
         var url = "/" + window.Globals.GameID + "/mark.json";
         jQuery.ajax({
             url: url,
-            dataType: 'json',
+            dataType: "json",
             cache: false,
-            method: 'POST',
+            method: "POST",
             data: {"row": this.props.row, "column": this.props.column},
             success: function (data) {
                 if (data.game_status.state === "won") {
@@ -23,12 +23,12 @@ var Square = React.createClass({
                 if (data.game_status.state === "draw") {
                     updateDraws();
                 }
-                //Re-render parent with updated data.
-                ReactDOM.render(<Grid data={data}/>, document.getElementById('content'));
-            }.bind(this),
+                // Re-render parent with updated data.
+                ReactDOM.render(<Grid data={data}/>, document.getElementById("content"));
+            },
             error: function (xhr, status, err) {
                 console.error(url, status, err.toString());
-            }.bind(this)
+            }
         });
     },
     render: function () {
@@ -144,14 +144,14 @@ var Grid = React.createClass({
                 if (winnerBlocks.length === 3) {
                     var k;
                     for (k = 0; k < 3; k++) {
-                        if (winnerBlocks[k][0] == i && winnerBlocks[k][1] == j) {
+                        if (winnerBlocks[k][0] === i && winnerBlocks[k][1] === j) {
                             winnerBlock = true;
                             break;
                         }
                     }
                 }
                 squares.push(
-                    <Square key={( i * 10) + j} row={i} column={j} value={item}
+                    <Square key={(i * 10) + j} row={i} column={j} value={item}
                             winnerBlock={winnerBlock} gameStatus={data.game_status.state}/>
                 );
             });
@@ -181,7 +181,7 @@ var Game = React.createClass({
     componentDidMount: function () {
         jQuery.ajax({
             url: this.props.url,
-            dataType: 'json',
+            dataType: "json",
             cache: false,
             success: function (data) {
                 this.setState({data: data});
@@ -199,4 +199,4 @@ var Game = React.createClass({
 });
 
 var url = "/" + window.Globals.GameID + ".json";
-ReactDOM.render(<Game url={url}/>, document.getElementById('content'));
+ReactDOM.render(<Game url={url}/>, document.getElementById("content"));
